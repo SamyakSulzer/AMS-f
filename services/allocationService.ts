@@ -1,0 +1,172 @@
+import { Allocation } from '@/models/allocation';
+
+const API_BASE_URL = 'http://127.0.0.1:8001';
+
+export interface PaginatedAllocationResponse {
+    data: Allocation[];
+    total: number;
+    page: number;
+    page_size: number;
+    total_pages: number;
+}
+
+export default async function getAllAllocations(
+    page: number = 1,
+    pageSize: number = 20,
+    sort_by: string = 'id',
+    order: string = 'asc',
+    search: string = ''
+): Promise<PaginatedAllocationResponse> {
+    try {
+        const response = await fetch(`${API_BASE_URL}/allocations?page=${page}&page_size=${pageSize}&sort_by=${sort_by}&order=${order}&search=${encodeURIComponent(search)}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            cache: 'no-store'
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch allocations: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log("Allocations API Response:", data);
+
+        // Based on PaginatedAllocationResponse
+        if (data && Array.isArray(data.data)) {
+            return data;
+        } else if (Array.isArray(data)) {
+            return {
+                data: data,
+                total: data.length,
+                page: 1,
+                page_size: data.length,
+                total_pages: 1
+            };
+        } else {
+            console.warn("Unexpected API response structure:", data);
+            return { data: [], total: 0, page: 1, page_size: pageSize, total_pages: 0 };
+        }
+
+    } catch (err) {
+        console.error("Allocation Service Error:", err);
+        throw err;
+    }
+}
+
+export async function createAllocation(allocation: Partial<Allocation>) {
+    try {
+        const formatDate = (date: any) => {
+            if (!date) return null;
+            if (date instanceof Date) return date.toISOString();
+            return date;
+        };
+
+        const payload = {
+            ...allocation,
+            allotted_at: formatDate(allocation.allotted_at) || new Date().toISOString(),
+            returned_at: formatDate(allocation.returned_at),
+        };
+
+        // Remove IDs if we're using emp_no/host_name flow to avoid backend validation confusion
+        if (payload.emp_no && (payload as any).employee_id === 0) delete (payload as any).employee_id;
+        if (payload.host_name && (payload as any).asset_id === 0) delete (payload as any).asset_id;
+
+        console.log("Creating allocation with payload:", payload);
+
+        const response = await fetch(`${API_BASE_URL}/allocations`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            let errorMessage = errorData.detail || `Failed to create allocation: ${response.status}`;
+            if (typeof errorMessage === 'object') {
+                errorMessage = JSON.stringify(errorMessage, null, 2);
+            }
+            throw new Error(errorMessage);
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error("Create Allocation Error:", err);
+        throw err;
+    }
+}
+
+export async function updateAllocation(id: number, allocation: Partial<Allocation>) {
+    try {
+        const formatDate = (date: any) => {
+            if (!date) return null;
+            if (date instanceof Date) return date.toISOString();
+            return date;
+        };
+
+        const payload = {
+            ...allocation,
+            allotted_at: formatDate(allocation.allotted_at),
+            returned_at: formatDate(allocation.returned_at),
+        };
+
+        const response = await fetch(`${API_BASE_URL}/allocations/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            let errorMessage = errorData.detail || `Failed to update allocation: ${response.status}`;
+            if (typeof errorMessage === 'object') {
+                errorMessage = JSON.stringify(errorMessage, null, 2);
+            }
+            throw new Error(errorMessage);
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error("Update Allocation Error:", err);
+        throw err;
+    }
+}
+
+export async function deleteAllocation(id: number) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/allocations/${id}`, {
+            method: 'DELETE',
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            let errorMessage = errorData.detail || `Failed to delete allocation: ${response.status}`;
+            if (typeof errorMessage === 'object') {
+                errorMessage = JSON.stringify(errorMessage, null, 2);
+            }
+            throw new Error(errorMessage);
+        }
+
+        return true;
+    } catch (err) {
+        console.error("Delete Allocation Error:", err);
+        throw err;
+    }
+}
+export async function getAssetHistory(assetId: number): Promise<Allocation[]> {
+    try {
+        const response = await fetch(`${API_BASE_URL}/allocations/asset/${assetId}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            cache: 'no-store'
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch asset history: ${response.status} ${response.statusText}`);
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error("Asset History Service Error:", err);
+        throw err;
+    }
+}
