@@ -63,15 +63,14 @@ export async function createAllocation(allocation: Partial<Allocation>) {
 
         const payload = {
             ...allocation,
+            // Ensure modified_by is a string to avoid the 'expected str, got int' error
+            modified_by: allocation.modified_by ? String(allocation.modified_by) : "admin",
             allotted_at: formatDate(allocation.allotted_at) || new Date().toISOString(),
             returned_at: formatDate(allocation.returned_at),
         };
 
-        // Remove IDs if we're using emp_no/host_name flow to avoid backend validation confusion
-        if (payload.emp_no && (payload as any).employee_id === 0) delete (payload as any).employee_id;
-        if (payload.host_name && (payload as any).asset_id === 0) delete (payload as any).asset_id;
-
-        console.log("Creating allocation with payload:", payload);
+        // If your UI has checkboxes for accessories, they will be included in '...allocation'
+        console.log("Sending Allocation to Backend:", payload);
 
         const response = await fetch(`${API_BASE_URL}/allocations`, {
             method: 'POST',
@@ -81,11 +80,7 @@ export async function createAllocation(allocation: Partial<Allocation>) {
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            let errorMessage = errorData.detail || `Failed to create allocation: ${response.status}`;
-            if (typeof errorMessage === 'object') {
-                errorMessage = JSON.stringify(errorMessage, null, 2);
-            }
-            throw new Error(errorMessage);
+            throw new Error(errorData.detail || `Error: ${response.status}`);
         }
 
         return await response.json();

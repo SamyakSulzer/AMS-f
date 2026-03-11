@@ -9,7 +9,7 @@ import { usePathname } from "next/navigation";
 import { Toaster } from 'react-hot-toast';
 import {
   LayoutDashboard, Box, Users, ClipboardList,
-  BarChart3, Bell, Menu, LogOut, User, Settings, ShieldCheck
+  BarChart3, Bell, Menu, LogOut, User, Settings, ShieldCheck, HardDrive
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -65,7 +65,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     { name: 'Master Data', icon: <ShieldCheck size={20} />, href: '/master' },
     { name: 'Mind Mapping', icon: <BarChart3 size={20} />, href: '/mind-mapping' },
     { name: 'Notifications', icon: <Bell size={20} />, href: '/notifications' },
-    { name: 'Bulk Data', icon: <Bell size={20} />, href: '/bulk-data' },
+    { name: 'Bulk Data', icon: <HardDrive size={20} />, href: '/bulk-data' },
+    { name: 'Form', icon: <ClipboardList size={20} />, href: '/bulk-data/form' },
   ];
 
   return (
