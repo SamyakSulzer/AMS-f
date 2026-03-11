@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Plus, Trash2, Search, Loader2, RefreshCw, ChevronDown, ChevronLeft, ChevronRight, X, AlertTriangle, Settings2, GripVertical } from 'lucide-react';
+import { Plus, Trash2, Search, Loader2, RefreshCw, ChevronDown, ChevronLeft, ChevronRight, X, AlertTriangle, Settings2, GripVertical, Undo2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import getAllAllocations, { createAllocation, deleteAllocation, updateAllocation } from '@/services/allocationService';
 import { getAllEmployees } from '@/services/employeeService';
@@ -36,6 +36,14 @@ export default function AllocationsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [assets, setAssets] = useState<Asset[]>([]);
+
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    setUserRole(localStorage.getItem("user_role"));
+  }, []);
+
+  const canEdit = userRole !== 'viewer';
 
   // Search States
   const [searchTerm, setSearchTerm] = useState("");
@@ -363,9 +371,9 @@ export default function AllocationsPage() {
             />
           </div>
           <button
-            disabled={isSaving}
+            disabled={isSaving || !canEdit}
             type="submit"
-            className="bg-blue-600 text-white py-2.5 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-md shadow-blue-100 flex items-center justify-center gap-2 disabled:bg-slate-300 cursor-pointer"
+            className="bg-blue-600 text-white py-2.5 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-md shadow-blue-100 flex items-center justify-center gap-2 disabled:bg-slate-300 disabled:cursor-not-allowed cursor-pointer"
           >
             {isSaving ? <Loader2 className="animate-spin" size={18} /> : <Plus size={18} />}
             {isSaving ? "Adding..." : "Add Allocation"}
@@ -463,17 +471,31 @@ export default function AllocationsPage() {
                     <td className="px-6 py-4 text-center">
                       <div className="flex items-center justify-center gap-2">
                         {!alloc.returned_at && (
+
                           <button
-                            onClick={() => handleOpenRetire(alloc)}
-                            className="p-2 text-slate-400 hover:text-amber-500 transition-colors hover:bg-amber-50 rounded-lg cursor-pointer"
-                            title="Retire / Return Asset"
+                            type="button"
+                            onClick={() => onClick(alloc)}
+                            disabled={!canEdit}
+                            className={[
+                              "inline-flex items-center justify-center",
+                              "h-9 w-9 rounded-lg",
+                              "text-slate-500 hover:text-amber-600",
+                              "hover:bg-amber-50",
+                              "disabled:opacity-40 disabled:cursor-not-allowed",
+                              "transition-colors"
+                            ].join(" ")}
+                            title="Return / Retire asset"
+                            aria-label="Return or retire asset"
                           >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v8" /><path d="m16 6-4 4-4-4" /><rect width="20" height="8" x="2" y="14" rx="2" /></svg>
+                            <Undo2 className="h-4 w-4" />
                           </button>
+
+
                         )}
                         <button
                           onClick={() => alloc.id && handleDelete(alloc.id)}
-                          className="text-slate-300 hover:text-red-500 transition-colors p-2 hover:bg-red-50 rounded-lg cursor-pointer"
+                          disabled={!canEdit}
+                          className="text-slate-300 hover:text-red-500 transition-colors p-2 hover:bg-red-50 rounded-lg cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
                           title="Delete Permanently"
                         >
                           <Trash2 size={16} />

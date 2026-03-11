@@ -174,3 +174,56 @@ export async function deleteAsset(id: number) {
         throw err;
     }
 }
+
+export interface AssetSummary {
+    category: string;
+    in_stock: number;
+    allocated: number;
+    retired: number;
+    total: number;
+    consumption: number;
+}
+
+/**
+ * Fetch asset summary by category and status.
+ */
+export async function getAssetSummary(): Promise<AssetSummary[]> {
+    try {
+        const response = await fetch(`http://127.0.0.1:8001/assets/summary`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            cache: 'no-store'
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch asset summary: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error("Asset Summary Service Error:", err);
+        throw err;
+    }
+}
+
+export async function uploadAssetsCSV(file: File) {
+    try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch(`http://127.0.0.1:8001/upload_assets_csv`, {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.detail || 'Failed to upload assets CSV');
+        }
+
+        return await response.json();
+    } catch (err) {
+        console.error("Upload Assets CSV Error:", err);
+        throw err;
+    }
+}

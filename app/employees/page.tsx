@@ -55,6 +55,14 @@ const EmployeesTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState<{ key: keyof Employee; direction: 'asc' | 'desc' } | null>({ key: 'id', direction: 'asc' });
 
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    setUserRole(localStorage.getItem("user_role"));
+  }, []);
+
+  const canEdit = userRole !== 'viewer';
+
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -450,7 +458,8 @@ const EmployeesTable = () => {
 
           <button
             onClick={openAddModal}
-            className="flex-1 md:flex-none bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl flex items-center justify-center gap-2 text-sm font-bold shadow-md active:scale-95 transition-all cursor-pointer"
+            disabled={!canEdit}
+            className="flex-1 md:flex-none bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl flex items-center justify-center gap-2 text-sm font-bold shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Plus size={18} /> New Employee
           </button>
@@ -488,10 +497,18 @@ const EmployeesTable = () => {
                     ))}
                     <td className="px-6 py-4 bg-white sticky right-0 shadow-[-10px_0_15px_-10px_rgba(0,0,0,0.05)] text-center">
                       <div className="flex items-center justify-center gap-3">
-                        <button onClick={() => openEditModal(emp)} className="p-1.5 text-slate-400 hover:text-indigo-600 transition-all hover:bg-indigo-50 rounded-md cursor-pointer">
+                        <button 
+                          onClick={() => openEditModal(emp)} 
+                          disabled={!canEdit}
+                          className="p-1.5 text-slate-400 hover:text-indigo-600 transition-all hover:bg-indigo-50 rounded-md cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                        >
                           <Pencil size={16} />
                         </button>
-                        <button onClick={() => setDeleteId(emp.id)} className="p-1.5 text-slate-400 hover:text-red-600 transition-all hover:bg-red-50 rounded-md cursor-pointer">
+                        <button 
+                          onClick={() => setDeleteId(emp.id)} 
+                          disabled={!canEdit}
+                          className="p-1.5 text-slate-400 hover:text-red-600 transition-all hover:bg-red-50 rounded-md cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                        >
                           <Trash2 size={16} />
                         </button>
                       </div>

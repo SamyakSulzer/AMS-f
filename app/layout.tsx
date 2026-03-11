@@ -65,6 +65,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     { name: 'Master Data', icon: <ShieldCheck size={20} />, href: '/master' },
     { name: 'Mind Mapping', icon: <BarChart3 size={20} />, href: '/mind-mapping' },
     { name: 'Notifications', icon: <Bell size={20} />, href: '/notifications' },
+    { name: 'Bulk Data', icon: <Bell size={20} />, href: '/bulk-data' },
   ];
 
   return (

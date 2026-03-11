@@ -40,6 +40,16 @@ export default function MasterDataPage() {
     const [keyForm, setKeyForm] = useState({ key_name: '', is_active: true });
     const [valueForm, setValueForm] = useState({ value: '', order_id: 0, is_active: true });
 
+    const [userRole, setUserRole] = useState<string | null>(null);
+
+    useEffect(() => {
+        setUserRole(localStorage.getItem("user_role"));
+    }, []);
+
+    const canCreateKey = userRole === 'master manager';
+    const canEditKey = userRole !== 'viewer';
+    const canEditValue = userRole !== 'viewer';
+
     const loadKeys = async () => {
         setIsLoadingKeys(true);
         try {
@@ -154,7 +164,8 @@ export default function MasterDataPage() {
                         setKeyForm({ key_name: '', is_active: true });
                         setIsKeyModalOpen(true);
                     }}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 text-sm font-bold shadow-md transition-all active:scale-95"
+                    disabled={!canCreateKey}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 text-sm font-bold shadow-md transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
                 >
                     <Plus size={18} /> New Master Key
                 </button>
@@ -211,7 +222,8 @@ export default function MasterDataPage() {
                                                         setKeyForm({ key_name: key.key_name, is_active: key.is_active });
                                                         setIsKeyModalOpen(true);
                                                     }}
-                                                    className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-white rounded-md shadow-sm border border-transparent hover:border-slate-100 transition-all"
+                                                    disabled={!canEditKey}
+                                                    className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-white rounded-md shadow-sm border border-transparent hover:border-slate-100 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                                                 >
                                                     <Pencil size={14} />
                                                 </button>
@@ -220,7 +232,8 @@ export default function MasterDataPage() {
                                                         e.stopPropagation();
                                                         setDeleteConfirm({ id: key.id, type: 'key' });
                                                     }}
-                                                    className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-white rounded-md shadow-sm border border-transparent hover:border-slate-100 transition-all"
+                                                    disabled={!canEditKey}
+                                                    className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-white rounded-md shadow-sm border border-transparent hover:border-slate-100 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                                                 >
                                                     <Trash2 size={14} />
                                                 </button>
@@ -266,7 +279,8 @@ export default function MasterDataPage() {
                                             setValueForm({ value: '', order_id: values.length + 1, is_active: true });
                                             setIsValueModalOpen(true);
                                         }}
-                                        className="bg-slate-900 hover:bg-black text-white px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-bold transition-all active:scale-95 shadow-lg shadow-slate-100"
+                                        disabled={!canEditValue}
+                                        className="bg-slate-900 hover:bg-black text-white px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-bold transition-all active:scale-95 shadow-lg shadow-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         <Plus size={14} /> Add Value
                                     </button>
@@ -310,13 +324,15 @@ export default function MasterDataPage() {
                                                                 });
                                                                 setIsValueModalOpen(true);
                                                             }}
-                                                            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                            disabled={!canEditValue}
+                                                            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                                                         >
                                                             <Pencil size={14} />
                                                         </button>
                                                         <button
                                                             onClick={() => setDeleteConfirm({ id: val.id, type: 'value' })}
-                                                            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                            disabled={!canEditValue}
+                                                            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                                                         >
                                                             <Trash2 size={14} />
                                                         </button>

@@ -18,6 +18,8 @@ const ALPHANUMERIC_REGEX = /^[a-zA-Z0-9\s-]+$/;
 
 // Mapping internal keys to human-readable labels
 const COLUMN_LABELS: Record<string, string> = {
+  created_by: "Created By",
+  modified_by: "Modified By",
   id: "ID",
   asset_type: "Category",
   serial_num: "Serial Number",
@@ -52,7 +54,7 @@ export default function AssetsPage() {
   // Column Personalization State
   const [isPersonalizeOpen, setIsPersonalizeOpen] = useState(false);
   const [visibleColumns, setVisibleColumns] = useState<(keyof Asset)[]>([
-    'asset_type', 'host_name', 'company_name', 'make', 'model', 'location', 'purchase_date', 'warranty_end_date', 'status'
+    'asset_type', 'host_name', 'make', 'model', 'location', 'purchase_date', 'warranty_end_date', 'status', 'created_by', 'modified_by'
   ]);
 
   const [locations, setLocations] = useState<string[]>([]);
@@ -74,6 +76,14 @@ export default function AssetsPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [sortConfig, setSortConfig] = useState<{ key: keyof Asset; direction: 'asc' | 'desc' } | null>({ key: 'id', direction: 'asc' });
+
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    setUserRole(localStorage.getItem("user_role"));
+  }, []);
+
+  const canEdit = userRole !== 'viewer';
 
   const loadAssets = async () => {
     setIsLoading(true);
@@ -441,7 +451,8 @@ export default function AssetsPage() {
 
           <button
             onClick={handleOpenAdd}
-            className="flex-1 md:flex-none bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl flex items-center justify-center gap-2 text-sm font-bold shadow-md active:scale-95 transition-all cursor-pointer"
+            disabled={!canEdit}
+            className="flex-1 md:flex-none bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl flex items-center justify-center gap-2 text-sm font-bold shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
           >
             <Plus size={18} /> New Asset
           </button>
@@ -473,8 +484,20 @@ export default function AssetsPage() {
                     ))}
                     <td className="px-6 py-4 bg-white sticky right-0 shadow-[-10px_0_15px_-10px_rgba(0,0,0,0.05)] text-center">
                       <div className="flex items-center justify-center gap-3">
-                        <button onClick={() => handleEdit(item)} className="p-1.5 text-slate-400 hover:text-indigo-600 transition-all hover:bg-indigo-50 rounded-md cursor-pointer"><Pencil size={16} /></button>
-                        <button onClick={() => setDeleteConfirmId(item.id.toString())} className="p-1.5 text-slate-400 hover:text-red-600 transition-all hover:bg-red-50 rounded-md cursor-pointer"><Trash2 size={16} /></button>
+                        <button
+                          onClick={() => handleEdit(item)}
+                          disabled={!canEdit}
+                          className="p-1.5 text-slate-400 hover:text-indigo-600 transition-all hover:bg-indigo-50 rounded-md cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-slate-400"
+                        >
+                          <Pencil size={16} />
+                        </button>
+                        <button
+                          onClick={() => setDeleteConfirmId(item.id.toString())}
+                          disabled={!canEdit}
+                          className="p-1.5 text-slate-400 hover:text-red-600 transition-all hover:bg-red-50 rounded-md cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-slate-400"
+                        >
+                          <Trash2 size={16} />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -599,7 +622,7 @@ export default function AssetsPage() {
             </div>
 
             <div className="flex justify-between items-center p-6 border-t border-slate-100 bg-slate-50">
-              <button onClick={() => setVisibleColumns(['asset_type', 'host_name', 'company_name', 'make', 'model', 'location', 'status'])} className="text-sm text-slate-500 hover:text-slate-800 transition-colors underline cursor-pointer">
+              <button onClick={() => setVisibleColumns(['asset_type', 'host_name', 'company_name', 'make', 'model', 'location', 'status', 'created_by', 'modified_by'])} className="text-sm text-slate-500 hover:text-slate-800 transition-colors underline cursor-pointer">
                 Reset all columns
               </button>
               <div className="flex gap-3">
