@@ -66,7 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     { name: 'Mind Mapping', icon: <BarChart3 size={20} />, href: '/mind-mapping' },
     { name: 'Notifications', icon: <Bell size={20} />, href: '/notifications' },
     { name: 'Bulk Data', icon: <HardDrive size={20} />, href: '/bulk-data' },
-    { name: 'Form', icon: <ClipboardList size={20} />, href: '/bulk-data/form' },
+    { name: 'Acknowledgement', icon: <ClipboardList size={20} />, href: '/acknowledgement' },
   ];
 
   return (
@@ -136,12 +136,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </header>
 
             <div className="flex flex-1 overflow-hidden">
-              <aside className={`bg-white border-r border-slate-200 transition-all duration-300 ease-in-out ${isSidebarOpen ? "w-52" : "w-0 overflow-hidden"}`}>
+              <aside className={`bg-white border-r border-slate-200 transition-all duration-300 ease-in-out ${isSidebarOpen ? "w-64" : "w-0 overflow-hidden"}`}>
                 <nav className="p-4 space-y-1">
                   {navItems.map((item) => (
-                    <Link key={item.name} href={item.href} className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-blue-50 hover:text-blue-700 transition-all font-medium whitespace-nowrap">
-                      {item.icon}
-                      <span>{item.name}</span>
+                    <Link key={item.name} href={item.href} className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-blue-50 hover:text-blue-700 transition-all font-medium whitespace-nowrap overflow-hidden">
+                      <div className="shrink-0 flex items-center justify-center">
+                        {item.icon}
+                      </div>
+                      <span className="truncate">{item.name}</span>
                     </Link>
                   ))}
                 </nav>
