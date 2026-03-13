@@ -55,7 +55,7 @@ export default function AssetsPage() {
   // Column Personalization State
   const [isPersonalizeOpen, setIsPersonalizeOpen] = useState(false);
   const [visibleColumns, setVisibleColumns] = useState<(keyof Asset)[]>([
-    'asset_type', 'host_name', 'make', 'model', 'location', 'purchase_date', 'warranty_end_date', 'status', 'created_by', 'modified_by'
+    'asset_type', 'host_name', 'assetno', 'serial_num', 'make', 'model', 'location', 'purchase_date', 'warranty_end_date', 'status', 'created_by', 'modified_by'
   ]);
 
   const [locations, setLocations] = useState<string[]>([]);
@@ -360,7 +360,7 @@ export default function AssetsPage() {
 
     if (col === 'purchase_date' || col === 'warranty_start_date' || col === 'warranty_end_date' || col === 'created_at' || col === 'modified_at' || col === 'last_issued') {
       let dateStyle = "text-xs text-slate-500";
-      
+
       if (col === 'warranty_end_date' && value) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -369,7 +369,7 @@ export default function AssetsPage() {
           dateStyle = "text-xs text-red-600 font-bold bg-red-50 px-1.5 py-0.5 rounded";
         }
       }
-      
+
       return <span className={dateStyle}>{value ? new Date(value as any).toLocaleDateString() : 'N/A'}</span>;
     }
 
@@ -635,7 +635,7 @@ export default function AssetsPage() {
             </div>
 
             <div className="flex justify-between items-center p-6 border-t border-slate-100 bg-slate-50">
-              <button onClick={() => setVisibleColumns(['asset_type', 'host_name', 'company_name', 'make', 'model', 'location', 'status', 'created_by', 'modified_by'])} className="text-sm text-slate-500 hover:text-slate-800 transition-colors underline cursor-pointer">
+              <button onClick={() => setVisibleColumns(['asset_type', 'host_name', 'assetno', 'serial_num', 'company_name', 'make', 'model', 'location', 'status', 'created_by', 'modified_by'])} className="text-sm text-slate-500 hover:text-slate-800 transition-colors underline cursor-pointer">
                 Reset all columns
               </button>
               <div className="flex gap-3">
