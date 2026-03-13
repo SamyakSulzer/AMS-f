@@ -53,6 +53,20 @@ export async function getAllEmployees(
     }
 }
 
+export async function getEmployeeById(id: number): Promise<Employee> {
+    const response = await fetch(`${API_URL}/${id}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store'
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to fetch employee: ${response.status}`);
+    }
+
+    return await response.json();
+}
+
 export async function createEmployee(employee: Partial<Employee>) {
     try {
         const formatDate = (date: any) => {

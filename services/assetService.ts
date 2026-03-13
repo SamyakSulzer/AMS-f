@@ -78,6 +78,20 @@ export async function getAssetsList(limit: number = 100): Promise<Asset[]> {
     }
 }
 
+export async function getAssetById(id: number): Promise<Asset> {
+    const response = await fetch(`http://127.0.0.1:8001/assets/${id}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store'
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to fetch asset: ${response.status}`);
+    }
+
+    return await response.json();
+}
+
 export async function createAsset(asset: Partial<Asset>) {
     try {
         const formatDate = (date: any) => {

@@ -1,21 +1,26 @@
 "use client";
-import React, { useState } from 'react';
-import { useParams } from 'next/navigation';
+
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Download, Save, Printer, Monitor, Hash, Building2, MapPin, Laptop, BadgeCheck, ShieldAlert, CheckSquare, Power, Headphones, Briefcase, Maximize, Target, Key, Database, BookOpen, AlertCircle, FileText, CheckCircle2 } from 'lucide-react';
+import { getAllocationById } from '@/services/allocationService';
+import { getAssetById } from '@/services/assetService';
+import { getEmployeeById } from '@/services/employeeService';
+import toast from 'react-hot-toast';
 
 export default function AssetIssueForm() {
-  const params = useParams();
-  const id = params?.id;
+  const searchParams = useSearchParams();
+  const id = searchParams.get('id');
 
   const [formData, setFormData] = useState({
-    userName: 'Kritika Jain',
-    dept: 'IT',
-    location: 'Pune',
-    makeModel: 'Lenovo ThinkPad',
-    hostName: 'LT-PUN-042',
-    monitorSerialNo: 'M-10294V',
-    serialNo: 'PF-329N8V',
-    accepted: false, // Added state for the undertaking checkbox
+    userName: 'Loading...',
+    dept: '-',
+    location: '-',
+    makeModel: '-',
+    hostName: '-',
+    monitorSerialNo: '-',
+    serialNo: '-',
+    accepted: false,
     accessories: {
       charger: true,
       wirelessMouse: false,
@@ -37,6 +42,43 @@ export default function AssetIssueForm() {
       putToUse: false,
     }
   });
+
+  const [sysUserName, setSysUserName] = useState<string>('System User');
+
+  useEffect(() => {
+    const storedName = localStorage.getItem("user_name");
+    if (storedName) setSysUserName(storedName);
+  }, []);
+
+  useEffect(() => {
+    async function fetchData() {
+      if (!id) return;
+      try {
+        const allocation = await getAllocationById(Number(id));
+
+        // Fetch asset and employee for more details
+        const [asset, employee] = await Promise.all([
+          getAssetById(allocation.asset_id),
+          getEmployeeById(allocation.employee_id)
+        ]);
+
+        setFormData(prev => ({
+          ...prev,
+          userName: employee.cn1 || allocation.employee_name || 'N/A',
+          dept: employee.division || employee.business_unit || 'IT',
+          location: employee.location || 'N/A',
+          makeModel: `${asset.make || ''} ${asset.model || ''}`.trim() || 'Lenovo ThinkPad',
+          hostName: asset.host_name || allocation.host_name || 'N/A',
+          serialNo: asset.serial_num || 'N/A',
+          monitorSerialNo: '-', // Not currently tracked in Asset model
+        }));
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        toast.error("Failed to load allocation data");
+      }
+    }
+    fetchData();
+  }, [id]);
 
   const handleAccessoryChange = (name: keyof typeof formData.accessories) => {
     setFormData(prev => ({
@@ -141,14 +183,6 @@ export default function AssetIssueForm() {
               <span className="text-slate-500 font-medium print:text-black">Host Name:</span>
               <span className="font-bold font-mono print:text-black">{formData.hostName || 'N/A'}</span>
             </div>
-            <div className="flex items-center justify-between border-b border-slate-200 pb-2 print:border-dotted print:border-slate-300">
-              <span className="text-slate-500 font-medium print:text-black">Monitor Make & Model:</span>
-              <span className="font-bold print:text-black">N/A</span>
-            </div>
-            <div className="flex items-center justify-between border-b border-slate-200 pb-2 print:border-dotted print:border-slate-300">
-              <span className="text-slate-500 font-medium print:text-black">Monitor Serial Number:</span>
-              <span className="font-bold font-mono print:text-black">{formData.monitorSerialNo || 'N/A'}</span>
-            </div>
           </div>
 
           <h3 className="font-bold text-slate-800 mb-4 print:text-black">Accessories:</h3>
@@ -169,10 +203,7 @@ export default function AssetIssueForm() {
               <span className="font-medium text-slate-700 group-hover:text-blue-600 transition-colors print:text-black">Laptop Bag</span>
               <input type="checkbox" checked={formData.accessories.laptopBag} onChange={() => handleAccessoryChange('laptopBag')} className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-600 cursor-pointer print:border-2" />
             </label>
-            <label className="flex items-center gap-3 cursor-pointer group">
-              <span className="font-medium text-slate-700 group-hover:text-blue-600 transition-colors print:text-black">Docking Station</span>
-              <input type="checkbox" checked={formData.accessories.dockingStation} onChange={() => handleAccessoryChange('dockingStation')} className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-600 cursor-pointer print:border-2" />
-            </label>
+
 
             <div className="flex items-center gap-3 pt-1">
               <span className="font-medium text-slate-700 print:text-black">Monitor</span>
@@ -232,9 +263,9 @@ export default function AssetIssueForm() {
           </div>
 
           <div className="text-right">
-            <p className="font-bold text-xl text-slate-800 mb-8 print:text-black">Assets Acceptance By:</p>
+            <p className="font-bold text-xl text-slate-800 mb-8 print:text-black">Assets Allocated By:</p>
             <div className="space-y-1">
-              <p className="font-bold text-slate-800 print:text-black">Khizar Shaikh</p>
+              <p className="font-bold text-slate-800 print:text-black">{sysUserName}</p>
               <p className="text-slate-600 font-medium print:text-black">IT</p>
               <p className="text-slate-600 font-medium print:text-black">Pune</p>
             </div>

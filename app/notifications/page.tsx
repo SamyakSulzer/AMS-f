@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Search, X, RefreshCw, AlertCircle, FileText, Users, Loader2, Copy } from "lucide-react";
+import { Search, X, RefreshCw, AlertCircle, FileText, Users, Loader2, Copy, ShieldAlert } from "lucide-react";
 import { getNotificationCounts, NotificationCounts, getNotificationDetails, NotificationDetails } from "@/services/notificationService";
 import toast from "react-hot-toast";
 
@@ -111,6 +111,31 @@ export default function NotificationsPage() {
                     </div>
                 </div>
 
+                {/* EXPIRED WARRANTIES */}
+                <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all group overflow-hidden relative">
+                    <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                        <ShieldAlert size={80} />
+                    </div>
+                    <div className="flex items-start justify-between mb-4">
+                        <div className="p-3 bg-red-50 rounded-2xl text-red-600">
+                            <ShieldAlert size={24} />
+                        </div>
+                        {isLoading ? (
+                            <Loader2 size={20} className="animate-spin text-slate-300" />
+                        ) : (
+                            <span className="text-3xl font-black text-slate-900">{counts?.expired_warranties || 0}</span>
+                        )}
+                    </div>
+                    <div>
+                        <h3 className="text-lg font-bold text-slate-900 mb-1">Expired Warranties</h3>
+                        <p className="text-sm text-slate-500">Assets whose hardware warranty coverage has lapsed</p>
+                    </div>
+                    <div className="mt-6 pt-6 border-t border-slate-50 flex justify-between items-center">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-red-600 bg-red-50 px-2.5 py-1 rounded-lg">High Risk</span>
+                        <button className="text-blue-600 text-sm font-bold hover:underline cursor-pointer">View Details</button>
+                    </div>
+                </div>
+
                 {/* TOTAL PENDING */}
                 <div className="bg-slate-900 p-6 rounded-3xl shadow-xl shadow-slate-200 group overflow-hidden relative">
                     <div className="absolute top-0 right-0 p-4 opacity-10">
@@ -167,12 +192,12 @@ export default function NotificationsPage() {
                             <Loader2 size={32} className="animate-spin text-slate-300" />
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {/* Assets List */}
                             <div>
                                 <h3 className="font-bold text-slate-700 mb-4 flex items-center gap-2">
                                     <FileText size={18} className="text-amber-500" />
-                                    Assets Requiring Action ({details?.incomplete_assets?.length || 0})
+                                    Incomplete Assets ({details?.incomplete_assets?.length || 0})
                                 </h3>
                                 {details?.incomplete_assets && details.incomplete_assets.length > 0 ? (
                                     <ul className="space-y-2">
@@ -194,7 +219,7 @@ export default function NotificationsPage() {
                             <div>
                                 <h3 className="font-bold text-slate-700 mb-4 flex items-center gap-2">
                                     <Users size={18} className="text-indigo-500" />
-                                    Employees Requiring Action ({details?.incomplete_employees?.length || 0})
+                                    Incomplete Employees ({details?.incomplete_employees?.length || 0})
                                 </h3>
                                 {details?.incomplete_employees && details.incomplete_employees.length > 0 ? (
                                     <ul className="space-y-2">
@@ -209,6 +234,33 @@ export default function NotificationsPage() {
                                     </ul>
                                 ) : (
                                     <p className="text-sm text-slate-500 italic p-4 bg-slate-50 rounded-xl text-center">No incomplete employees found.</p>
+                                )}
+                            </div>
+
+                            {/* Expired Warranty Hostnames */}
+                            <div>
+                                <h3 className="font-bold text-slate-700 mb-4 flex items-center gap-2">
+                                    <ShieldAlert size={18} className="text-red-500" />
+                                    Expired Warranties ({details?.expired_warranties?.length || 0})
+                                </h3>
+                                {details?.expired_warranties && details.expired_warranties.length > 0 ? (
+                                    <ul className="space-y-2">
+                                        {details.expired_warranties.filter(host => host.toLowerCase().includes(searchTerm.toLowerCase())).map((hostname, i) => (
+                                            <li key={`host-${i}`} className="flex items-center justify-between p-3 bg-red-50/50 border border-red-100 rounded-xl hover:bg-red-50 transition-colors group">
+                                                <button 
+                                                    onClick={() => copyToClipboard(hostname)} 
+                                                    className="text-sm font-bold text-slate-700 hover:text-red-600 transition-colors text-left"
+                                                >
+                                                    {hostname}
+                                                </button>
+                                                <button onClick={() => copyToClipboard(hostname)} className="p-1.5 text-slate-400 group-hover:text-red-600 rounded-md hover:bg-white shadow-sm transition-all" title="Copy Hostname">
+                                                    <Copy size={16} />
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p className="text-sm text-slate-500 italic p-4 bg-slate-50 rounded-xl text-center">No expired warranties found.</p>
                                 )}
                             </div>
                         </div>

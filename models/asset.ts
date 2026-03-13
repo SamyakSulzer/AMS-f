@@ -1,5 +1,6 @@
 export interface Asset {
     id: number;
+    assetno: number;
     asset_type: string;
     serial_num: string;
     host_name?: string | null;

@@ -1,6 +1,7 @@
 export interface NotificationCounts {
     incomplete_assets: number;
     incomplete_employees: number;
+    expired_warranties: number;
     total: number;
 }
 
@@ -26,6 +27,7 @@ export async function getNotificationCounts(userName: string): Promise<Notificat
 export interface NotificationDetails {
     incomplete_assets: string[];
     incomplete_employees: string[];
+    expired_warranties: string[];
 }
 
 export async function getNotificationDetails(userName: string): Promise<NotificationDetails> {

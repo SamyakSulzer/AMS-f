@@ -165,3 +165,17 @@ export async function getAssetHistory(assetId: number): Promise<Allocation[]> {
         throw err;
     }
 }
+
+export async function getAllocationById(id: number): Promise<Allocation> {
+    const response = await fetch(`${API_BASE_URL}/allocations/${id}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store'
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to fetch allocation: ${response.status}`);
+    }
+
+    return await response.json();
+}

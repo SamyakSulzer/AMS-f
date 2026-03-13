@@ -21,6 +21,7 @@ const COLUMN_LABELS: Record<string, string> = {
   created_by: "Created By",
   modified_by: "Modified By",
   id: "ID",
+  assetno: "Asset Number",
   asset_type: "Category",
   serial_num: "Serial Number",
   host_name: "Host Name",
@@ -140,6 +141,7 @@ export default function AssetsPage() {
   */
   const initialForm: Asset = {
     id: 0,
+    assetno: 0,
     serial_num: '',
     asset_type: '',
     host_name: '',
@@ -357,7 +359,18 @@ export default function AssetsPage() {
     }
 
     if (col === 'purchase_date' || col === 'warranty_start_date' || col === 'warranty_end_date' || col === 'created_at' || col === 'modified_at' || col === 'last_issued') {
-      return <span className="text-xs text-slate-500">{value ? new Date(value as any).toLocaleDateString() : 'N/A'}</span>;
+      let dateStyle = "text-xs text-slate-500";
+      
+      if (col === 'warranty_end_date' && value) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const warrantyDate = new Date(value as any);
+        if (warrantyDate < today) {
+          dateStyle = "text-xs text-red-600 font-bold bg-red-50 px-1.5 py-0.5 rounded";
+        }
+      }
+      
+      return <span className={dateStyle}>{value ? new Date(value as any).toLocaleDateString() : 'N/A'}</span>;
     }
 
     if (col === 'company_name') {
@@ -708,6 +721,20 @@ export default function AssetsPage() {
 
             <form onSubmit={handleSave} className="p-6 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase ml-1">
+                    Asset Number <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    className="w-full border border-slate-200 p-2.5 rounded-xl text-sm outline-none bg-slate-50/50 focus:border-blue-500 transition-all font-medium"
+                    placeholder="e.g. 1001"
+                    value={formData.assetno || ''}
+                    onChange={(e) => handleInputChange({ assetno: Number(e.target.value) })}
+                  />
+                </div>
+
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold text-slate-400 uppercase ml-1">
                     Serial Number <span className="text-red-500">*</span>

@@ -35,9 +35,9 @@ export default function Dashboard() {
 
   const getChartData = () => {
     if (summary.length === 0) return [];
-    
+
     let stats = { in_stock: 0, allocated: 0, retired: 0, total: 0 };
-    
+
     if (selectedCategory === "All") {
       stats = summary.reduce((acc, curr) => ({
         in_stock: acc.in_stock + curr.in_stock,
@@ -48,11 +48,11 @@ export default function Dashboard() {
     } else {
       const found = summary.find(s => s.category === selectedCategory);
       if (found) {
-        stats = { 
-          in_stock: found.in_stock, 
-          allocated: found.allocated, 
-          retired: found.retired, 
-          total: found.total 
+        stats = {
+          in_stock: found.in_stock,
+          allocated: found.allocated,
+          retired: found.retired,
+          total: found.total
         };
       }
     }
@@ -69,7 +69,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-slate-50/50 p-6 md:p-8">
       <div className="max-w-7xl mx-auto space-y-10">
-        
+
         {/* HEADER SECTION */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
           <div className="space-y-1">
@@ -81,7 +81,7 @@ export default function Dashboard() {
               <p>Real-time analytics for enterprise IT hardware infrastructure.</p>
             </div>
           </div>
-          
+
           <div className="flex gap-4 w-full md:w-auto">
             <Link href="/assets" className="flex-1 md:flex-none px-6 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:scale-95 flex items-center justify-center gap-2 group">
               <ArrowUpRight size={18} className="text-slate-400 group-hover:text-indigo-500 transition-colors" />
@@ -201,8 +201,8 @@ export default function Dashboard() {
                         <div className="flex flex-col items-end gap-2">
                           <div className="flex items-center gap-3">
                             <span className={`text-xs font-black px-2 py-0.5 rounded-md ${item.consumption > 80 ? 'text-rose-600 bg-rose-50' :
-                                item.consumption > 50 ? 'text-amber-600 bg-amber-50' :
-                                  'text-indigo-600 bg-indigo-50'
+                              item.consumption > 50 ? 'text-amber-600 bg-amber-50' :
+                                'text-indigo-600 bg-indigo-50'
                               }`}>
                               {item.consumption}%
                             </span>
@@ -210,8 +210,8 @@ export default function Dashboard() {
                           <div className="w-32 bg-slate-100 h-1.5 rounded-full overflow-hidden shadow-inner">
                             <div
                               className={`h-full transition-all duration-1000 ease-out ${item.consumption > 80 ? 'bg-gradient-to-r from-rose-500 to-rose-400' :
-                                  item.consumption > 50 ? 'bg-gradient-to-r from-amber-500 to-amber-400' :
-                                    'bg-gradient-to-r from-indigo-600 to-indigo-400'
+                                item.consumption > 50 ? 'bg-gradient-to-r from-amber-500 to-amber-400' :
+                                  'bg-gradient-to-r from-indigo-600 to-indigo-400'
                                 }`}
                               style={{ width: `${item.consumption}%` }}
                             ></div>
@@ -248,10 +248,10 @@ export default function Dashboard() {
                   <p className="text-sm text-slate-400 font-medium">Visual breakdown of hardware status.</p>
                 </div>
               </div>
-              
+
               <div className="relative w-full md:w-64">
                 <Layers className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                <select 
+                <select
                   className="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all appearance-none cursor-pointer"
                   onChange={(e) => setSelectedCategory(e.target.value)}
                   value={selectedCategory}
@@ -296,7 +296,7 @@ export default function Dashboard() {
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Total Items</p>
                       <p className="text-4xl font-black text-slate-800 tracking-tighter">
-                        {selectedCategory === "All" 
+                        {selectedCategory === "All"
                           ? summary.reduce((acc, curr) => acc + curr.total, 0)
                           : summary.find(s => s.category === selectedCategory)?.total || 0
                         }
@@ -331,15 +331,7 @@ export default function Dashboard() {
                 <div className="w-12 h-12 bg-indigo-500/50 backdrop-blur-md rounded-2xl flex items-center justify-center mb-6">
                   <TrendingUp size={24} />
                 </div>
-                <h4 className="text-2xl font-black tracking-tight mb-2">Category Insight</h4>
-                <p className="text-indigo-100/80 text-sm font-medium leading-relaxed">
-                  {selectedCategory === "All" 
-                    ? "Currently monitoring your global inventory. Utilization is stable across most hardware categories."
-                    : `Analysis for ${selectedCategory} shows a ${
-                        summary.find(s => s.category === selectedCategory)?.consumption || 0
-                      }% utilization rate current fiscal quarter.`
-                  }
-                </p>
+
               </div>
 
               <div className="space-y-4">

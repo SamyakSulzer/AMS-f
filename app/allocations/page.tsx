@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Plus, Trash2, Search, Loader2, RefreshCw, ChevronDown, ChevronLeft, ChevronRight, X, AlertTriangle, Settings2, GripVertical, Undo2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Plus, Trash2, Search, Loader2, RefreshCw, ChevronDown, ChevronLeft, ChevronRight, X, AlertTriangle, Settings2, GripVertical, Undo2, FileText } from 'lucide-react';
 import toast from 'react-hot-toast';
 import getAllAllocations, { createAllocation, deleteAllocation, updateAllocation } from '@/services/allocationService';
 import { getAllEmployees } from '@/services/employeeService';
@@ -29,6 +30,7 @@ const COLUMN_LABELS: Record<string, string> = {
 };
 
 export default function AllocationsPage() {
+  const router = useRouter();
   // --- STATE ---
   const [allocations, setAllocations] = useState<Allocation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -445,6 +447,7 @@ export default function AllocationsPage() {
           <table className="w-full text-left border-collapse">
             <thead className="bg-slate-50/50 border-b border-slate-200">
               <tr className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                <th className="px-6 py-4">Ack</th>
                 {visibleColumns.map(col => (
                   <th key={col} className="px-6 py-4">
                     {COLUMN_LABELS[col]}
@@ -456,13 +459,24 @@ export default function AllocationsPage() {
             <tbody className="divide-y divide-slate-100">
               {isLoading ? (
                 <tr>
-                  <td colSpan={visibleColumns.length + 1} className="px-6 py-12 text-center">
+                  <td colSpan={visibleColumns.length + 2} className="px-6 py-12 text-center">
                     <Loader2 className="animate-spin mx-auto text-blue-600" size={24} />
                   </td>
                 </tr>
               ) : filteredAllocations.length > 0 ? (
                 filteredAllocations.map((alloc) => (
                   <tr key={alloc.id} className="hover:bg-slate-50/50 text-sm transition-colors group">
+                    <td className="px-6 py-4">
+                      {(alloc.asset_type?.toLowerCase() === 'laptop' || alloc.asset_type?.toLowerCase() === 'workstation') && (
+                        <button
+                          onClick={() => router.push(`/acknowledgement?id=${alloc.id}`)}
+                          className="flex items-center justify-center h-9 w-9 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
+                          title="Generate Acknowledgement"
+                        >
+                          <FileText size={18} />
+                        </button>
+                      )}
+                    </td>
                     {visibleColumns.map(col => (
                       <td key={`${alloc.id}-${col}`} className="px-6 py-4">
                         {renderCellContent(alloc, col)}
@@ -474,7 +488,7 @@ export default function AllocationsPage() {
 
                           <button
                             type="button"
-                            onClick={() => onClick(alloc)}
+                            onClick={() => handleOpenRetire(alloc)}
                             disabled={!canEdit}
                             className={[
                               "inline-flex items-center justify-center",
@@ -506,7 +520,7 @@ export default function AllocationsPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={visibleColumns.length + 1} className="px-6 py-12 text-center text-slate-400 italic text-sm">
+                  <td colSpan={visibleColumns.length + 2} className="px-6 py-12 text-center text-slate-400 italic text-sm">
                     No matching allocation records found.
                   </td>
                 </tr>
