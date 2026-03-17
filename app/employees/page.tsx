@@ -467,17 +467,17 @@ const EmployeesTable = () => {
       </div>
 
       {/* TABLE CONTAINER */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto custom-scrollbar">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col h-[calc(100vh-200px)] overflow-hidden">
+        <div className="overflow-auto custom-scrollbar flex-1">
           <table className="w-full text-left border-collapse min-w-[1100px]">
-            <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+            <thead className="sticky top-0 z-20 bg-slate-50 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+              <tr className="bg-slate-50 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                 {visibleColumns.map(col => (
-                  <th key={col} className="px-6 py-4">
+                  <th key={col} className="px-6 py-4 border-b border-slate-200">
                     <div className="flex items-center gap-1">{COLUMN_LABELS[col]}</div>
                   </th>
                 ))}
-                <th className="px-6 py-4 text-center bg-white sticky right-0 shadow-[-10px_0_15px_-10px_rgba(0,0,0,0.05)]">Actions</th>
+                <th className="px-6 py-4 text-center bg-slate-50 sticky right-0 z-30 shadow-[-10px_0_15px_-10px_rgba(0,0,0,0.05)] border-b border-slate-200">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">

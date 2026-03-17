@@ -24,5 +24,8 @@ export interface Asset {
     is_deleted: boolean;
     staging_status?: string | null;
     status?: string | null;
+    cost_center?: string;
+    physical_present?: string;
+    legal_entities?: string;
 }
 

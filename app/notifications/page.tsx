@@ -80,10 +80,7 @@ export default function NotificationsPage() {
                         <h3 className="text-lg font-bold text-slate-900 mb-1">Incomplete Assets</h3>
                         <p className="text-sm text-slate-500">Asset records missing key information created/modified by you</p>
                     </div>
-                    <div className="mt-6 pt-6 border-t border-slate-50 flex justify-between items-center">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-amber-600 bg-amber-50 px-2.5 py-1 rounded-lg">Action Required</span>
-                        <button className="text-blue-600 text-sm font-bold hover:underline cursor-pointer">View Details</button>
-                    </div>
+
                 </div>
 
                 {/* INCOMPLETE EMPLOYEES */}
@@ -105,10 +102,7 @@ export default function NotificationsPage() {
                         <h3 className="text-lg font-bold text-slate-900 mb-1">Incomplete Employees</h3>
                         <p className="text-sm text-slate-500">Employee profiles missing mandatory details assigned to you</p>
                     </div>
-                    <div className="mt-6 pt-6 border-t border-slate-50 flex justify-between items-center">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">Update Profile</span>
-                        <button className="text-blue-600 text-sm font-bold hover:underline cursor-pointer">View Details</button>
-                    </div>
+
                 </div>
 
                 {/* EXPIRED WARRANTIES */}
@@ -130,10 +124,7 @@ export default function NotificationsPage() {
                         <h3 className="text-lg font-bold text-slate-900 mb-1">Expired Warranties</h3>
                         <p className="text-sm text-slate-500">Assets whose hardware warranty coverage has lapsed</p>
                     </div>
-                    <div className="mt-6 pt-6 border-t border-slate-50 flex justify-between items-center">
-                        <span className="text-[10px] font-black uppercase tracking-wider text-red-600 bg-red-50 px-2.5 py-1 rounded-lg">High Risk</span>
-                        <button className="text-blue-600 text-sm font-bold hover:underline cursor-pointer">View Details</button>
-                    </div>
+
                 </div>
 
                 {/* TOTAL PENDING */}
@@ -155,15 +146,7 @@ export default function NotificationsPage() {
                         <h3 className="text-lg font-bold text-white mb-1">Total Pending Tasks</h3>
                         <p className="text-sm text-slate-400">Combined total of data entries requiring your attention</p>
                     </div>
-                    <div className="mt-6 pt-6 border-t border-white/10 flex items-center gap-2">
-                        <div className="h-2 flex-1 bg-white/10 rounded-full overflow-hidden">
-                            <div
-                                className="h-full bg-blue-500 transition-all duration-1000"
-                                style={{ width: counts?.total ? '60%' : '0%' }}
-                            ></div>
-                        </div>
-                        <span className="text-[10px] font-bold text-slate-400">PRIORITY</span>
-                    </div>
+
                 </div>
             </div>
 
@@ -172,16 +155,7 @@ export default function NotificationsPage() {
                 <div className="p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
                     <div className="flex items-center gap-4 w-full md:w-auto">
                         <h2 className="text-lg font-black text-slate-800">Notification Details</h2>
-                        <div className="relative flex-1 md:w-64">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
-                            <input
-                                type="text"
-                                placeholder="Filter alerts..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
-                            />
-                        </div>
+
                     </div>
 
                 </div>
@@ -247,8 +221,8 @@ export default function NotificationsPage() {
                                     <ul className="space-y-2">
                                         {details.expired_warranties.filter(host => host.toLowerCase().includes(searchTerm.toLowerCase())).map((hostname, i) => (
                                             <li key={`host-${i}`} className="flex items-center justify-between p-3 bg-red-50/50 border border-red-100 rounded-xl hover:bg-red-50 transition-colors group">
-                                                <button 
-                                                    onClick={() => copyToClipboard(hostname)} 
+                                                <button
+                                                    onClick={() => copyToClipboard(hostname)}
                                                     className="text-sm font-bold text-slate-700 hover:text-red-600 transition-colors text-left"
                                                 >
                                                     {hostname}

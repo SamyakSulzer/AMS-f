@@ -18,13 +18,12 @@ const ALPHANUMERIC_REGEX = /^[a-zA-Z0-9\s-]+$/;
 
 // Mapping internal keys to human-readable labels
 const COLUMN_LABELS: Record<string, string> = {
-  created_by: "Created By",
-  modified_by: "Modified By",
   id: "ID",
-  assetno: "Asset Number",
   asset_type: "Category",
+  assetno: "Asset Number",
   serial_num: "Serial Number",
   host_name: "Host Name",
+  u_uid: "UUID",
   make: "Make",
   model: "Model",
   lifecycle_status: "Lifecycle",
@@ -32,16 +31,20 @@ const COLUMN_LABELS: Record<string, string> = {
   warranty_start_date: "Warranty Start",
   warranty_end_date: "Warranty End",
   last_issued: "Last Issued",
-  u_uid: "UUID",
-  mac_id: "MAC ID",
   company_name: "Employee",
-  location: "Location",
+  cost_center: "Cost Centre",
+  physical_present: "Physically Present",
+  legal_entities: "Legal Entities",
+  is_allocated: "Allocated",
+  remarks: "Remarks",
   status: "Status",
   staging_status: "Staging Status",
-  remarks: "Remarks",
+  created_by: "Created By",
   created_at: "Created At",
+  modified_by: "Modified By",
   modified_at: "Modified At",
-  is_allocated: "Allocated",
+  location: "Location",
+  mac_id: "MAC ID",
 };
 
 export default function AssetsPage() {
@@ -55,7 +58,7 @@ export default function AssetsPage() {
   // Column Personalization State
   const [isPersonalizeOpen, setIsPersonalizeOpen] = useState(false);
   const [visibleColumns, setVisibleColumns] = useState<(keyof Asset)[]>([
-    'asset_type', 'host_name', 'make', 'model', 'location', 'purchase_date', 'warranty_end_date', 'status', 'created_by', 'modified_by'
+    'id', 'asset_type', 'assetno', 'serial_num', 'host_name', 'u_uid', 'make', 'model', 'lifecycle_status', 'purchase_date', 'warranty_start_date', 'warranty_end_date', 'last_issued', 'company_name', 'cost_center', 'physical_present', 'legal_entities', 'is_allocated', 'remarks', 'status', 'staging_status', 'created_by', 'created_at', 'modified_by', 'modified_at', 'location', 'mac_id'
   ]);
 
   const [locations, setLocations] = useState<string[]>([]);
@@ -165,6 +168,9 @@ export default function AssetsPage() {
     created_by: 'n/a',
     modified_at: new Date().toISOString(),
     modified_by: 'n/a',
+    cost_center: 'Not allocated yet',
+    physical_present: 'Not allocated yet',
+    legal_entities: 'Not allocated yet',
   };
 
   const [formData, setFormData] = useState<Asset>(initialForm);
@@ -360,7 +366,7 @@ export default function AssetsPage() {
 
     if (col === 'purchase_date' || col === 'warranty_start_date' || col === 'warranty_end_date' || col === 'created_at' || col === 'modified_at' || col === 'last_issued') {
       let dateStyle = "text-xs text-slate-500";
-      
+
       if (col === 'warranty_end_date' && value) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -369,7 +375,7 @@ export default function AssetsPage() {
           dateStyle = "text-xs text-red-600 font-bold bg-red-50 px-1.5 py-0.5 rounded";
         }
       }
-      
+
       return <span className={dateStyle}>{value ? new Date(value as any).toLocaleDateString() : 'N/A'}</span>;
     }
 
@@ -414,16 +420,13 @@ export default function AssetsPage() {
 
             <div className="relative hidden lg:block">
               <select
-                value={sortConfig?.key || 'asset_type'}
+                value={sortConfig?.key || 'id'}
                 onChange={(e) => { setSortConfig(prev => ({ key: e.target.value as keyof Asset, direction: prev?.direction || 'asc' })); setCurrentPage(1); }}
                 className="bg-white border border-slate-200 rounded-xl text-sm px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500/20 shadow-sm cursor-pointer font-medium min-w-[140px] appearance-none pr-8"
               >
-                <option value="host_name">Sort by Host Name</option>
-                <option value="model">Sort by Model</option>
-                <option value="location">Sort by Location</option>
-                <option value="status">Sort by Status</option>
-                <option value="is_allocated">Sort by Allocated</option>
-                <option value="asset_type">Sort by Category</option>
+                {allAvailableFields.map(field => (
+                  <option key={field} value={field}>Sort by {COLUMN_LABELS[field]}</option>
+                ))}
               </select>
               <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400" />
             </div>
@@ -473,17 +476,17 @@ export default function AssetsPage() {
       </div>
 
       {/* TABLE CONTAINER */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto custom-scrollbar">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col h-[calc(100vh-200px)] overflow-hidden">
+        <div className="overflow-auto custom-scrollbar flex-1">
           <table className="w-full text-left border-collapse min-w-[1100px]">
-            <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+            <thead className="sticky top-0 z-20 bg-slate-50 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+              <tr className="bg-slate-50 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                 {visibleColumns.map(col => (
-                  <th key={col} className="px-6 py-4">
+                  <th key={col} className="px-6 py-4 border-b border-slate-200">
                     <div className="flex items-center gap-1">{COLUMN_LABELS[col]}</div>
                   </th>
                 ))}
-                <th className="px-6 py-4 text-center bg-white sticky right-0 shadow-[-10px_0_15px_-10px_rgba(0,0,0,0.05)]">Actions</th>
+                <th className="px-6 py-4 text-center bg-slate-50 sticky right-0 z-30 shadow-[-10px_0_15px_-10px_rgba(0,0,0,0.05)] border-b border-slate-200">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -635,7 +638,7 @@ export default function AssetsPage() {
             </div>
 
             <div className="flex justify-between items-center p-6 border-t border-slate-100 bg-slate-50">
-              <button onClick={() => setVisibleColumns(['asset_type', 'host_name', 'company_name', 'make', 'model', 'location', 'status', 'created_by', 'modified_by'])} className="text-sm text-slate-500 hover:text-slate-800 transition-colors underline cursor-pointer">
+              <button onClick={() => setVisibleColumns([...allAvailableFields])} className="text-sm text-slate-500 hover:text-slate-800 transition-colors underline cursor-pointer">
                 Reset all columns
               </button>
               <div className="flex gap-3">

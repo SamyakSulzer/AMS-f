@@ -442,18 +442,18 @@ export default function AllocationsPage() {
       </div>
 
       {/* TABLE SECTION */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead className="bg-slate-50/50 border-b border-slate-200">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[calc(100vh-200px)]">
+        <div className="overflow-auto custom-scrollbar flex-1">
+          <table className="w-full text-left border-collapse min-w-[1100px]">
+            <thead className="sticky top-0 z-20 bg-slate-50 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
               <tr className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                <th className="px-6 py-4">Ack</th>
+                <th className="px-6 py-4 border-b border-slate-200">Ack</th>
                 {visibleColumns.map(col => (
-                  <th key={col} className="px-6 py-4">
+                  <th key={col} className="px-6 py-4 border-b border-slate-200">
                     {COLUMN_LABELS[col]}
                   </th>
                 ))}
-                <th className="px-6 py-4 text-center">Actions</th>
+                <th className="px-6 py-4 text-center bg-slate-50 sticky right-0 z-30 shadow-[-10px_0_15px_-10px_rgba(0,0,0,0.05)] border-b border-slate-200">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -467,22 +467,20 @@ export default function AllocationsPage() {
                 filteredAllocations.map((alloc) => (
                   <tr key={alloc.id} className="hover:bg-slate-50/50 text-sm transition-colors group">
                     <td className="px-6 py-4">
-                      {(alloc.asset_type?.toLowerCase() === 'laptop' || alloc.asset_type?.toLowerCase() === 'workstation') && (
-                        <button
-                          onClick={() => router.push(`/acknowledgement?id=${alloc.id}`)}
-                          className="flex items-center justify-center h-9 w-9 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
-                          title="Generate Acknowledgement"
-                        >
-                          <FileText size={18} />
-                        </button>
-                      )}
+                      <button
+                        onClick={() => router.push(`/acknowledgement?id=${alloc.id}`)}
+                        className="flex items-center justify-center h-9 w-9 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
+                        title="Generate Acknowledgement"
+                      >
+                        <FileText size={18} />
+                      </button>
                     </td>
                     {visibleColumns.map(col => (
                       <td key={`${alloc.id}-${col}`} className="px-6 py-4">
                         {renderCellContent(alloc, col)}
                       </td>
                     ))}
-                    <td className="px-6 py-4 text-center">
+                    <td className="px-6 py-4 text-center bg-white sticky right-0 shadow-[-10px_0_15px_-10px_rgba(0,0,0,0.05)]">
                       <div className="flex items-center justify-center gap-2">
                         {!alloc.returned_at && (
 
