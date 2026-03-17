@@ -1,5 +1,7 @@
 import { Asset } from '@/models/asset';
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
+
 export interface PaginatedAssetResponse {
     data: Asset[];
     total: number;
@@ -20,7 +22,7 @@ export default async function getAllAssets(
     asset_type: string = 'All'
 ): Promise<PaginatedAssetResponse> {
     try {
-        const response = await fetch(`http://127.0.0.1:8001/asset_page?page=${page}&page_size=${pageSize}&sort_by=${sort_by}&order=${order}&search=${encodeURIComponent(search)}&asset_type=${encodeURIComponent(asset_type)}`, {
+        const response = await fetch(`${API_BASE_URL}/asset_page?page=${page}&page_size=${pageSize}&sort_by=${sort_by}&order=${order}&search=${encodeURIComponent(search)}&asset_type=${encodeURIComponent(asset_type)}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             cache: 'no-store'
@@ -61,7 +63,7 @@ export default async function getAllAssets(
  */
 export async function getAssetsList(limit: number = 100): Promise<Asset[]> {
     try {
-        const response = await fetch(`http://127.0.0.1:8001/asset?limit=${limit}`, {
+        const response = await fetch(`${API_BASE_URL}/asset?limit=${limit}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             cache: 'no-store'
@@ -79,7 +81,7 @@ export async function getAssetsList(limit: number = 100): Promise<Asset[]> {
 }
 
 export async function getAssetById(id: number): Promise<Asset> {
-    const response = await fetch(`http://127.0.0.1:8001/assets/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/assets/${id}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         cache: 'no-store'
@@ -111,7 +113,7 @@ export async function createAsset(asset: Partial<Asset>) {
             modified_at: new Date().toISOString()
         };
 
-        const response = await fetch(`http://127.0.0.1:8001/assets`, {
+        const response = await fetch(`${API_BASE_URL}/assets`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -149,7 +151,7 @@ export async function updateAsset(id: number, asset: Partial<Asset>) {
             modified_at: new Date().toISOString()
         };
 
-        const response = await fetch(`http://127.0.0.1:8001/assets/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/assets/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -171,7 +173,7 @@ export async function updateAsset(id: number, asset: Partial<Asset>) {
 
 export async function deleteAsset(id: number) {
     try {
-        const response = await fetch(`http://127.0.0.1:8001/assets/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/assets/${id}`, {
             method: 'DELETE',
         });
 
@@ -203,7 +205,7 @@ export interface AssetSummary {
  */
 export async function getAssetSummary(): Promise<AssetSummary[]> {
     try {
-        const response = await fetch(`http://127.0.0.1:8001/assets/summary`, {
+        const response = await fetch(`${API_BASE_URL}/assets/summary`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             cache: 'no-store'
@@ -225,7 +227,7 @@ export async function uploadAssetsCSV(file: File) {
         const formData = new FormData();
         formData.append('file', file);
 
-        const response = await fetch(`http://127.0.0.1:8001/upload_assets_csv`, {
+        const response = await fetch(`${API_BASE_URL}/upload_assets_csv`, {
             method: 'POST',
             body: formData,
         });

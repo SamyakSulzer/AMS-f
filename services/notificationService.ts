@@ -7,7 +7,7 @@ export interface NotificationCounts {
 
 export async function getNotificationCounts(userName: string): Promise<NotificationCounts> {
     try {
-        const response = await fetch(`http://127.0.0.1:8001/notifications/counts?user_name=${encodeURIComponent(userName)}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/notifications/counts?user_name=${encodeURIComponent(userName)}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             cache: 'no-store'
@@ -32,7 +32,7 @@ export interface NotificationDetails {
 
 export async function getNotificationDetails(userName: string): Promise<NotificationDetails> {
     try {
-        const response = await fetch(`http://127.0.0.1:8001/notifications/details?user_name=${encodeURIComponent(userName)}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/notifications/details?user_name=${encodeURIComponent(userName)}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             cache: 'no-store'

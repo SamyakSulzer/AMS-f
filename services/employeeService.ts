@@ -1,6 +1,6 @@
 import { Employee } from '@/models/employee';
 
-const API_URL = 'http://127.0.0.1:8001/employees';
+const API_URL = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'}/employees`;
 
 export interface PaginatedEmployeeResponse {
     data: Employee[];
