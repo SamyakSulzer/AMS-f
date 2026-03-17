@@ -236,8 +236,8 @@ export default function Dashboard() {
         </div>
 
         {/* VISUAL ANALYTICS - Interactive Pie Chart with Filtering */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
-          <div className="lg:col-span-2 bg-white rounded-[2rem] border border-slate-200/60 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)] p-8">
+        <div className="pb-12">
+          <div className="bg-white rounded-[2rem] border border-slate-200/60 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)] p-8">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
               <div className="flex items-center gap-4">
                 <div className="p-3 bg-indigo-50 rounded-2xl">
@@ -323,33 +323,6 @@ export default function Dashboard() {
                 ))}
               </div>
             </div>
-          </div>
-
-          <div className="bg-indigo-600 rounded-[2rem] p-8 text-white relative overflow-hidden shadow-2xl shadow-indigo-200">
-            <div className="relative z-10 h-full flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 bg-indigo-500/50 backdrop-blur-md rounded-2xl flex items-center justify-center mb-6">
-                  <TrendingUp size={24} />
-                </div>
-
-              </div>
-
-              <div className="space-y-4">
-                <div className="bg-white/10 backdrop-blur-md border border-white/10 p-4 rounded-2xl">
-                  <div className="flex justify-between items-end mb-1">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-indigo-100">Recommended Stock</span>
-                    <span className="text-xs font-black text-white">+12%</span>
-                  </div>
-                  <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
-                    <div className="bg-white h-full w-[65%]" />
-                  </div>
-                </div>
-                <button className="w-full py-3 bg-white text-indigo-600 rounded-xl text-sm font-bold shadow-xl hover:bg-slate-50 transition-all active:scale-95">
-                  View Detailed Logs
-                </button>
-              </div>
-            </div>
-            <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-white/10 rounded-full blur-3xl opacity-50"></div>
           </div>
         </div>
       </div>
