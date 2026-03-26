@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Plus, X, Trash2, Search, Loader2, Pencil, Eye,
   ChevronUp, ChevronDown, AlertTriangle, Copy, RefreshCw,
-  ChevronLeft, ChevronRight, Settings2, GripVertical
+  ChevronLeft, ChevronRight, Settings2, GripVertical, Scan, QrCode
 } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import toast from 'react-hot-toast';
 //import { getAllAssets } from '@/services/assetService';
 
@@ -79,6 +80,7 @@ export default function AssetsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
+  const [selectedQRAsset, setSelectedQRAsset] = useState<Asset | null>(null);
   const [sortConfig, setSortConfig] = useState<{ key: keyof Asset; direction: 'asc' | 'desc' } | null>({ key: 'id', direction: 'asc' });
 
   const [userRole, setUserRole] = useState<string | null>(null);
@@ -176,6 +178,50 @@ export default function AssetsPage() {
   const [formData, setFormData] = useState<Asset>(initialForm);
   const [isDirty, setIsDirty] = useState(false);
   const [models, setModels] = useState<string[]>([]);
+
+  // Scanner States & Ref
+  const scanInputRef = useRef<HTMLInputElement>(null);
+  const [barcodeValue, setBarcodeValue] = useState('');
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanResult, setScanResult] = useState<string | null>(null);
+
+  // Focus scanner input when modal opens for a new asset
+  useEffect(() => {
+    if (isModalOpen && !editId) {
+      const timer = setTimeout(() => {
+        scanInputRef.current?.focus();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isModalOpen, editId]);
+
+  const handleBarcodeScan = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      const value = barcodeValue.trim();
+      if (!value) return;
+
+      setIsScanning(true);
+      setScanResult(null);
+
+      // Simulate a small delay for the 'loading' state as requested
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      try {
+
+        handleInputChange({ serial_num: value });
+        setScanResult(`Successfully scanned Serial: ${value}`);
+        setBarcodeValue('');
+        toast.success(`Serial Number captured: ${value}`, { icon: '🔍' });
+      } catch (err) {
+        setScanResult('Failed to process scan');
+        toast.error('Check scanner connection or input');
+      } finally {
+        setIsScanning(false);
+        // Refocus for next scan
+        scanInputRef.current?.focus();
+      }
+    }
+  };
 
   // Dynamic Model Fetch based on Make
   useEffect(() => {
@@ -501,6 +547,13 @@ export default function AssetsPage() {
                     <td className="px-6 py-4 bg-white sticky right-0 shadow-[-10px_0_15px_-10px_rgba(0,0,0,0.05)] text-center">
                       <div className="flex items-center justify-center gap-3">
                         <button
+                          onClick={() => setSelectedQRAsset(item)}
+                          className="p-1.5 text-slate-400 hover:text-blue-600 transition-all hover:bg-blue-50 rounded-md cursor-pointer"
+                          title="Show QR Code"
+                        >
+                          <QrCode size={16} />
+                        </button>
+                        <button
                           onClick={() => handleEdit(item)}
                           disabled={!canEdit}
                           className="p-1.5 text-slate-400 hover:text-indigo-600 transition-all hover:bg-indigo-50 rounded-md cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-slate-400"
@@ -721,6 +774,42 @@ export default function AssetsPage() {
                 </button>
               </div>
             </div>
+
+            {/* QUICK SCAN INTERFACE - Only for New Assets */}
+            {!editId && (
+              <div className="px-6 py-4 bg-blue-50/50 border-b border-blue-100/50 group">
+                <div className="flex items-center gap-4">
+                  <div className="bg-blue-100 p-2.5 rounded-xl text-blue-600 shadow-sm">
+                    <Scan size={18} className={isScanning ? 'animate-pulse' : ''} />
+                  </div>
+                  <div className="flex-1 relative">
+                    <input
+                      ref={scanInputRef}
+                      type="text"
+                      placeholder="Ready for Barcode / QR Scan..."
+                      className="w-full bg-transparent border-b-2 border-blue-200 py-1 text-sm font-bold text-blue-900 outline-none focus:border-blue-500 transition-all placeholder:text-blue-300"
+                      value={barcodeValue}
+                      onChange={(e) => setBarcodeValue(e.target.value)}
+                      onKeyDown={handleBarcodeScan}
+                      disabled={isScanning}
+                    />
+                    {isScanning && (
+                      <div className="absolute right-0 top-1/2 -translate-y-1/2">
+                        <Loader2 className="animate-spin text-blue-500" size={16} />
+                      </div>
+                    )}
+                  </div>
+                  {scanResult && (
+                    <div className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest animate-in fade-in slide-in-from-right-2">
+                      {scanResult}
+                    </div>
+                  )}
+                </div>
+                <p className="text-[9px] font-bold text-blue-400 uppercase tracking-widest mt-2 ml-12 opacity-60">
+                  RugTek LS-3002 HID Active • Scanner automatically sends Enter
+                </p>
+              </div>
+            )}
 
             <form onSubmit={handleSave} className="p-6 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -953,6 +1042,40 @@ export default function AssetsPage() {
         </div >
       )
       }
+
+      {/* QR CODE MODAL */}
+      {selectedQRAsset && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[80] p-4">
+          <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center p-6 border-b bg-slate-50/50">
+              <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">Asset QR Code</h2>
+              <button onClick={() => setSelectedQRAsset(null)} className="text-slate-400 hover:text-red-500 transition-all cursor-pointer">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="p-8 flex flex-col items-center gap-6">
+              <div className="bg-white p-4 rounded-2xl shadow-inner border-2 border-slate-100">
+                <QRCodeSVG
+                  value={JSON.stringify(selectedQRAsset)}
+                  size={256}
+                  level="M"
+                  includeMargin={true}
+                />
+              </div>
+              <div className="text-center space-y-1">
+                <p className="text-sm font-black text-slate-900">{selectedQRAsset.host_name || 'Generic Asset'}</p>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{selectedQRAsset.serial_num}</p>
+              </div>
+              <button
+                onClick={() => setSelectedQRAsset(null)}
+                className="w-full bg-slate-900 text-white py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 cursor-pointer shadow-lg"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar { height: 6px; }

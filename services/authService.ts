@@ -3,7 +3,8 @@ import { SysUser } from '@/models/sys_user';
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
 
 export interface LoginResponse {
-    message: string;
+    access_token: string;
+    token_type: string;
     user_id: number;
     username: string;
     role: string;

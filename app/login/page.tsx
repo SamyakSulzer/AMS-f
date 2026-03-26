@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { ShieldCheck, Lock, Fingerprint, ShieldAlert, UserPlus, LogIn, User, Hash, Briefcase } from 'lucide-react';
+import { ShieldCheck, Lock, Fingerprint, ShieldAlert, UserPlus, LogIn, User, Hash, Briefcase, CheckCircle2, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { login, register } from '@/services/authService';
 
@@ -20,6 +20,14 @@ export default function LoginPage() {
     user_role: 'viewer' as 'administrator' | 'viewer' | 'master manager'
   });
 
+  const passwordChecks = useMemo(() => [
+    { label: 'At least 8 characters',        met: formData.password.length >= 8 },
+    { label: 'One uppercase letter (A–Z)',    met: /[A-Z]/.test(formData.password) },
+    { label: 'One lowercase letter (a–z)',    met: /[a-z]/.test(formData.password) },
+    { label: 'One number (0–9)',              met: /\d/.test(formData.password) },
+    { label: 'One symbol (@, #, or $)',       met: /[@#$]/.test(formData.password) },
+  ], [formData.password]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -34,6 +42,8 @@ export default function LoginPage() {
         localStorage.setItem("user_name", response.emp_name);
         localStorage.setItem("user_role", response.role);
         localStorage.setItem("username", response.username);
+        localStorage.setItem("access_token", response.access_token);
+        localStorage.setItem("token_type", response.token_type);
 
         toast.success(`Welcome back, ${response.emp_name}!`);
         router.push('/');
@@ -137,6 +147,23 @@ export default function LoginPage() {
                     />
                   </div>
                 </div>
+
+                {/* Password Requirements - Register only */}
+                {!isLogin && formData.password.length > 0 && (
+                  <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 space-y-1.5">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Password Requirements</p>
+                    {passwordChecks.map((check) => (
+                      <div key={check.label} className="flex items-center gap-2">
+                        {check.met
+                          ? <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
+                          : <XCircle size={13} className="text-slate-300 shrink-0" />}
+                        <span className={`text-xs font-medium ${check.met ? 'text-emerald-600' : 'text-slate-400'}`}>
+                          {check.label}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 {!isLogin && (
                   <>

@@ -220,7 +220,7 @@ export default function AllocationsPage() {
       if (selectedAllocation.asset_id) {
         const { updateAsset } = await import('@/services/assetService');
         await updateAsset(selectedAllocation.asset_id, {
-          status: 'Available',
+          status: 'In-Stock',
           is_allocated: false,
           modified_by: userName
         });
@@ -688,7 +688,7 @@ export default function AllocationsPage() {
               </div>
 
               <p className="text-xs text-slate-500 italic leading-relaxed">
-                By confirming, the asset status will be set to <span className="text-emerald-600 font-bold">Available</span> and the allocation record will be marked as <span className="text-amber-600 font-bold">Returned</span>.
+                By confirming, the asset status will be set to <span className="text-emerald-600 font-bold">In-Stock</span> and the allocation record will be marked as <span className="text-amber-600 font-bold">Returned</span>.
               </p>
 
               <div className="flex gap-3 pt-4">

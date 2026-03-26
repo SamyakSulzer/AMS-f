@@ -31,7 +31,7 @@ export default function UserMenu() {
         <div className="absolute top-14 right-0 w-64 bg-white rounded-xl shadow-2xl border border-slate-100 py-4 z-50 animate-in fade-in zoom-in-95 duration-150">
           <div className="px-6 pb-4 border-b border-slate-50">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Account</p>
-            <p className="text-sm font-bold text-slate-800">samyak.dahale@sulzer.com</p>
+
           </div>
 
           <div className="py-2">
